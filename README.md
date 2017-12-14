@@ -25,7 +25,7 @@ MedjedCyborg.handle_command_prerun(cmd <CyborgCommand>) # Gets called right afte
 MedjedCyborg.handle_command_postrun(cmd <CyborgCommand>) # Gets called right after a command has finished executing, whether it errored or not.
 ```
 ## How to write modules
-Commands are just coroutines whose names are prefixed with `cmd_`. All commands get passed the cyborg instance itself as well as the message object of the command that's being executed. They're automatically loaded by Medjed.Cyborg. This means that you have to import `asyncio` in each of your modules. Here's an example module called `Example` that sends a green embed with `Hello World` as its description as a response to the command `Hello`.
+Commands are just coroutines whose names are prefixed with `cmd_` that are automatically loaded by MedjedCyborg. This means that you have to import `asyncio` in each of your modules. All commands get passed the cyborg instance itself as well as the message object of the command that's being executed. Here's an example module that sends a green embed with `Hello World` as its description as a response to the command `Hello`.
 ```py
 # Example.py
 import asyncio
