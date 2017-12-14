@@ -148,10 +148,13 @@ class MedjedCyborg:
 		except OSError as err:
 			self.log("failed loading modules from " + self.mod_dir + ": " + str(err))
 			return
-		for i in range(len(mods) - 1):
-			if not mods[i].endswith(".py"): del mods[i]
-		for file in mods:
-			self.load_module(self.mod_dir + "/" + file)
+		if not len(mods):
+			if self.logging: self.log("no modules to load")
+		for i in range(len(mods)):
+			if not mods[i][-3:] == ".py": del mods[i]
+		for fl in mods:
+			if self.logging: self.log("loading " + fl)
+			self.load_module(self.mod_dir + "/" + fl)
 
 	def embed(self, description, color):
 		if not isinstance(description, str):
