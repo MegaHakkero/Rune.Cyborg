@@ -18,14 +18,14 @@ MedjedCyborg.load_module(path <string>) # Attempts to load a module from the pro
 MedjedCyborg.load_all_modules() # Attempts to load all modules from the directory given to the client with the mod_dir parameter
 MedjedCyborg.embed(description <string>, color <int>) # A convenient function for creating text-only embeds
 ```
-I've also included in some hooks for certain events like the client connecting. They're all coroutines (`async def`). The `CyborgCommand` type I've used in some of them is an object that automatically parses commands when initialized.
+I've also included in some hooks for certain events like the client connecting. They're all coroutines (`async def`) that you can override with a class that extends `MedjedCyborg`. The `CyborgCommand` type I've used in some of them is an object that automatically parses commands when initialized.
 ```py
 MedjedCyborg.handle_ready() # Gets called when the client becomes ready (AKA has connected and logged in)
 MedjedCyborg.handle_command_prerun(cmd <CyborgCommand>) # Gets called right after a command has been parsed, but not yet called
 MedjedCyborg.handle_command_postrun(cmd <CyborgCommand>) # Gets called right after a command has finished executing, whether it errored or not.
 ```
 ## How to write modules
-It's pretty simple. Commands are just coroutines whose names are prefixed with `cmd_`. All commands get passed the cyborg instance itself as well as the message object of the command that's being executed. They're automatically loaded by Medjed.Cyborg. This means that you have to import `asyncio` in each of your modules. Here's an example module called `Example` that sends a green embed with `Hello World` as its description as a response to the command `Hello`.
+Commands are just coroutines whose names are prefixed with `cmd_`. All commands get passed the cyborg instance itself as well as the message object of the command that's being executed. They're automatically loaded by Medjed.Cyborg. This means that you have to import `asyncio` in each of your modules. Here's an example module called `Example` that sends a green embed with `Hello World` as its description as a response to the command `Hello`.
 ```py
 # Example.py
 import asyncio
