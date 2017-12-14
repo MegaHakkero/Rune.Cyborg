@@ -150,8 +150,14 @@ class MedjedCyborg:
 			return
 		if not len(mods):
 			if self.logging: self.log("no modules to load")
-		for i in range(len(mods)):
-			if not mods[i][-3:] == ".py": del mods[i]
+		i = 0
+		l = len(mods)
+		while i < l:
+			if not mods[i][-3:] == ".py":
+				del mods[i]
+				l -= 1
+				continue
+			i += 1
 		for fl in mods:
 			if self.logging: self.log("loading " + fl)
 			self.load_module(self.mod_dir + "/" + fl)
