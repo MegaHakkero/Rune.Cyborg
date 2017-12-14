@@ -77,7 +77,7 @@ class MedjedCyborg:
 		@self.client.event
 		async def on_ready():
 			if self.logging: self.log("connected")
-			self.handle_ready()	
+			await self.handle_ready()	
 	
 		@self.client.event
 		async def on_message(msg):
@@ -90,7 +90,7 @@ class MedjedCyborg:
 					self.log("invalid command: " + str(err))
 					await msg.channel.send(embed=self.embed("invalid syntax (" + str(err) + ")", 0xBB0000))
 					return
-				self.handle_command_prerun(cmd)
+				await self.handle_command_prerun(cmd)
 				mod_found = False
 				for mod in self.modules:
 					if mod.name == cmd.module:
@@ -116,7 +116,7 @@ class MedjedCyborg:
 				if not mod_found:
 					if self.logging: self.log("no such module: " + cmd.module)
 					await msg.channel.send(embed=self.embed("no such module: `" + cmd.module + "`", 0xBB0000))
-				self.handle_command_postrun(cmd)
+				await self.handle_command_postrun(cmd)
 
 	def log(self, string):
 		print(str(self.log_prefix) + ":", string)
@@ -167,12 +167,12 @@ class MedjedCyborg:
 		embed.set_footer(text="Medjed.Cyborg " + self.version)
 		return embed
 
-	def handle_ready(self):
+	async def handle_ready(self):
 		self.log("DUMMY handle_ready called")
 
-	def handle_command_prerun(self, cmd):
+	async def handle_command_prerun(self, cmd):
 		self.log("DUMMY handle_command_prerun called")
 
-	def handle_command_postrun(self, cmd):
+	async def handle_command_postrun(self, cmd):
 		self.log("DUMMY handle_command_postrun called")
 
