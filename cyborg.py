@@ -2,7 +2,6 @@ import importlib.util
 import discord
 import asyncio
 import shlex
-import types
 import os
 
 from inspect import getfullargspec
