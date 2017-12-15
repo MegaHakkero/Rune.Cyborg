@@ -23,6 +23,7 @@ class CyborgCommand:
 		self.module = pathlist[0]
 		self.command = pathlist[1]
 		self.args = cmdlist[1:]
+		if not self.args: self.args = list()
 
 class CyborgModule:
 	def __init__(self, name, path):
