@@ -124,18 +124,16 @@ class MedjedCyborg:
 		if self.logging: self.log("trying to connect")
 		self.client.run(self.token, bot=False)
 
-	def load_module(self, path):
-		if not path.endswith(".py"):
-			if self.logging: self.log("not a python script: " + path)
-			return
+	def load_module(self, name):
 		mod = None
 		try:
-			name = os.path.basename(path)[:-3]
+			filename = self.mod_dir + "/" + name + ".py"
 			for mod2 in self.modules:
 				if name == mod2.name:
 					if self.logging: self.log("a module with the same name is already loaded")
 					return
-			mod = CyborgModule(name, path)
+			if self.logging: self.log("loading module " + name + " (" + os.path.basename(os.path.dirname(filename)) + "/" + os.path.basename(filename) + ")")
+			mod = CyborgModule(name, filename)
 		except Exception as err:
 			self.log("failed loading module: " + str(err))
 			return
@@ -150,6 +148,7 @@ class MedjedCyborg:
 			return
 		if not len(mods):
 			if self.logging: self.log("no modules to load")
+			return
 		i = 0
 		l = len(mods)
 		while i < l:
@@ -159,8 +158,39 @@ class MedjedCyborg:
 				continue
 			i += 1
 		for fl in mods:
-			if self.logging: self.log("loading " + fl)
-			self.load_module(self.mod_dir + "/" + fl)
+			self.load_module(fl[:-3])
+	
+	def unload_module(self, name):
+		for i in range(len(self.modules)):
+			if self.modules[i].name == name:
+				if self.logging: self.log("unloading module " + name)
+				del self.modules[i]
+				return
+		raise OSError("module not loaded")
+
+	def unload_all_modules(self):
+		self.modules = list()
+
+	def reload_module(self, name):
+		try:
+			self.unload_module(name)
+		except OSError as err:
+			self.log("can't unload module " + str(err))
+			return
+		filename = self.mod_dir + "/" + name + ".py"
+		if not os.path.isfile(filename):
+			raise OSError("module stopped existing")
+		self.load_module(name)
+
+	def reload_all_modules(self):
+		mods = self.modules
+		self.unload_all_modules()
+		for i in range(len(mods)):
+			filename = self.mod_dir + "/" + mods[i].name + ".py"
+			if not os.path.isfile(filename):
+				if self.logging: self.log("ignoring nonexistent module")
+				continue
+			self.load_module(mods[i].name)
 
 	def embed(self, description, color):
 		if not isinstance(description, str):

@@ -14,8 +14,12 @@ Following are all of the client's functions that you can use in modules to imple
 ```py
 MedjedCyborg.log(message <string>) # Prints a log message to the terminal screen
 MedjedCyborg.connect() # Connects and logs the client into Discord
-MedjedCyborg.load_module(path <string>) # Attempts to load a module from the provided full path
-MedjedCyborg.load_all_modules() # Attempts to load all modules from the directory given to the client with the mod_dir parameter
+MedjedCyborg.load_module(name <string>) # Attempts to load a module from the directory the client's mod_dir parameter points to
+MedjedCyborg.load_all_modules() # Attempts to load all modules from the directory mod_dir points to
+MedjedCyborg.unload_module(name <string>) # Attempts to unload the given module
+MedjedCyborg.unload_all_modules(): # Unloads all modules
+MedjedCyborg.reload_module(name <string>) # Attempts to reload the given module from mod_dir
+MedjedCyborg.reload_all_modules() # Attempts to reload all modules from mod_dir
 MedjedCyborg.embed(description <string>, color <int>) # A convenient function for creating text-only embeds
 ```
 I've also included in some hooks for certain events like the client connecting. They're all coroutines (`async def`) that you can override with a class that extends `MedjedCyborg`. The `CyborgCommand` type I've used in some of them is an object that automatically parses commands when initialized.
