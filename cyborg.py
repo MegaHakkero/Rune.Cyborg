@@ -12,7 +12,8 @@ class CyborgCommand:
 			raise ValueError("cmd must be a string")
 		self.raw_command = cmd
 		lexer = shlex.shlex(cmd, posix=True)
-		lexer.wordchars += "-./~?*="
+		lexer.wordchars += "-./~?*=#"
+		lexer.commenters = ""
 		lexer.whitespace_split = True
 		cmdlist = list(lexer)
 		if len(cmdlist) < 1:
