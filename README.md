@@ -1,7 +1,7 @@
 # Medjed.Cyborg
 A module-based framework for writing Discord selfbots in Python
 Dependencies:
-`discord.py 1.0.0a (AKA rewrite)` - [https://github.com/Rapptz/discord.py/tree/rewrite](Link)
+`discord.py 1.0.0a (AKA rewrite)` - [Link](https://github.com/Rapptz/discord.py/tree/rewrite)
 ## How to use
 If you're just writing a selfbot, you only need to care about the `MedjedCyborg` class, which is the client. It has a few required parameters without default values (your token and user ID). The other parameters are also required, but they have a default value, so you can just use those. Here's a full list of all the arguments you can pass to the client:
 ```md
