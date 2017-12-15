@@ -43,6 +43,6 @@ Modules' names are determined by their file name, so `Example.py` would create a
 
 To load this example module, you have to load it with the `load_module` function of the client:
 ```py
-MedjedCyborg.load_module("Example.py")
+MedjedCyborg.load_module("Example")
 ```
 After this, you can use the `Hello` command in Discord: `<prefix>Example.Hello`, `<prefix>` being the command prefix you chose when you initialized the client, or `//` if you used the default one.
