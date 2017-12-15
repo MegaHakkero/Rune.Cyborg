@@ -19,7 +19,7 @@ MedjedCyborg.connect() # Connects and logs the client into Discord
 MedjedCyborg.load_module(name <string>) # Attempts to load a module from the directory the client's mod_dir parameter points to
 MedjedCyborg.load_all_modules() # Attempts to load all modules from the directory mod_dir points to
 MedjedCyborg.unload_module(name <string>) # Attempts to unload the given module
-MedjedCyborg.unload_all_modules(): # Unloads all modules
+MedjedCyborg.unload_all_modules() # Unloads all modules
 MedjedCyborg.reload_module(name <string>) # Attempts to reload the given module from mod_dir
 MedjedCyborg.reload_all_modules() # Attempts to reload all modules from mod_dir
 MedjedCyborg.embed(description <string>, color <int>) # A convenient function for creating text-only embeds
