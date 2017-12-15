@@ -1,5 +1,5 @@
 # Medjed.Cyborg
-A module-based framework for writing Discord selfbots in Python
+A module-based framework for writing Discord selfbots in Python <br>
 Dependencies: <br>
 `discord.py 1.0.0a (AKA rewrite)` - [Link](https://github.com/Rapptz/discord.py/tree/rewrite)
 ## How to use
