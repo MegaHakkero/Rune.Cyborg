@@ -22,7 +22,7 @@ class CyborgCommand:
 			raise ValueError("no module path in command")
 		self.module = pathlist[0]
 		self.command = pathlist[1]
-		self.args = cmdlist[:1]
+		self.args = cmdlist[1:]
 
 class CyborgModule:
 	def __init__(self, name, path):
@@ -106,7 +106,7 @@ class MedjedCyborg:
 								except Exception as err:
 									if self.logging: self.log("failed to run " + cmd.module + "." + cmd.command + ": " + str(err))
 									await msg.channel.send(embed=self.embed("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), 0xBB0000))
-								if self.logging: self.log("successfully called " + cmd.module + "." + cmd.command)
+								if self.logging: self.log("completed " + cmd.module + "." + cmd.command)
 								break
 						if not cmd_found:
 							if self.logging: self.log("no such command: " + cmd.command + " in module " + cmd.module)
@@ -130,13 +130,11 @@ class MedjedCyborg:
 			filename = self.mod_dir + "/" + name + ".py"
 			for mod2 in self.modules:
 				if name == mod2.name:
-					if self.logging: self.log("a module with the same name is already loaded")
-					return
+					raise OSError("module is already loaded")
 			if self.logging: self.log("loading module " + name + " (" + os.path.basename(os.path.dirname(filename)) + "/" + os.path.basename(filename) + ")")
 			mod = CyborgModule(name, filename)
 		except Exception as err:
-			self.log("failed loading module: " + str(err))
-			return
+			raise OSError("failed loading module: " + str(err))
 		self.modules.append(mod)
 
 	def load_all_modules(self):
@@ -175,8 +173,7 @@ class MedjedCyborg:
 		try:
 			self.unload_module(name)
 		except OSError as err:
-			self.log("can't unload module " + str(err))
-			return
+			raise OSError("can't unload " + name + " for reload: " + str(err))
 		filename = self.mod_dir + "/" + name + ".py"
 		if not os.path.isfile(filename):
 			raise OSError("module stopped existing")
@@ -192,7 +189,7 @@ class MedjedCyborg:
 				continue
 			self.load_module(mods[i].name)
 
-	def embed(self, description, color):
+	def embed(self, description, color=0x000000):
 		if not isinstance(description, str):
 			if self.logging: self.log("embed: invalid description")
 			return None
