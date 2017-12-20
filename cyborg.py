@@ -119,8 +119,17 @@ class MedjedCyborg:
 					await msg.channel.send(embed=self.embed("no such module: `" + cmd.module + "`", 0xBB0000))
 				await self.handle_command_postrun(cmd)
 
-	def log(self, string):
-		print(str(self.log_prefix) + ":", string)
+	def log(self, string, reason="INFO", subprefix=None):
+		if not isinstance(reason, str):
+			raise ValueError("reason should be str, not " + type(reason))
+		if not isinstance(string, str):
+			raise ValueError("string should be str, not " + type(string))
+		if subprefix:
+			if not isinstance(subprefix, str):
+				raise ValueError("subprefix should be str, not " + type(subprefix))
+			print(self.log_prefix + "/" + subprefix, "[" + reason + "]", string)
+		else:
+			print(self.log_prefix, "[" + reason + "]", string)
 
 	def connect(self):
 		if self.logging: self.log("trying to connect")
@@ -169,6 +178,7 @@ class MedjedCyborg:
 		raise OSError("module not loaded")
 
 	def unload_all_modules(self):
+		if self.logging: self.log("unloading all modules")
 		self.modules = list()
 
 	def reload_module(self, name):
