@@ -48,6 +48,13 @@ class CyborgModule:
 		self.name     = name
 		self.mod      = mod
 		self.commands = commands
+	
+	def lookup_command(self, cmd):
+		if not isinstance(cmd, str):
+			raise ValueError("cmd must be str, not " + type(cmd))
+		for cmd2 in self.commands:
+			if cmd2 == cmd:
+				return self.commands[cmd]
 
 class MedjedCyborg:
 	def __init__(self, token, uid, cmd_prefix="//", logging=False, log_prefix="Medjed.Cyborg", mod_dir="./modules"):
@@ -88,35 +95,29 @@ class MedjedCyborg:
 				try:
 					cmd = CyborgCommand(msg.content[len(self.cmd_prefix):])
 				except Exception as err:
-					self.log("invalid command: " + str(err))
-					await msg.channel.send(embed=self.embed("invalid syntax (" + str(err) + ")", 0xBB0000))
+					self.log("invalid command: " + str(err), "ERROR")
+					await msg.channel.send(embed=self.embed("invalid command (" + str(err) + ")", 0xBB0000))
 					return
 				await self.handle_command_prerun(cmd)
-				mod_found = False
-				for mod in self.modules:
-					if mod.name == cmd.module:
-						mod_found = True
-						cmd_found = False
-						for cmd2 in mod.commands:
-							if cmd2 == cmd.command:
-								cmd_found = True
-								try:
-									if len(getfullargspec(mod.commands[cmd.command])[0]) < 3:
-										await mod.commands[cmd.command](self, msg)
-									else:
-										await mod.commands[cmd.command](self, msg, *cmd.args)
-								except Exception as err:
-									if self.logging: self.log("failed to run " + cmd.module + "." + cmd.command + ": " + str(err))
-									await msg.channel.send(embed=self.embed("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), 0xBB0000))
-								if self.logging: self.log("completed " + cmd.module + "." + cmd.command)
-								break
-						if not cmd_found:
-							if self.logging: self.log("no such command: " + cmd.command + " in module " + cmd.module)
-							await msg.channel.send(embed=self.embed("no such command `" + cmd.command + "` in module `" + cmd.module + "`", 0xBB0000))
-						break
-				if not mod_found:
-					if self.logging: self.log("no such module: " + cmd.module)
+				mod = self.lookup_module(cmd.module)
+				if not mod:
+					if self.logging: self.log("no such module: " + cmd.module, "ERROR", "lookup_module")
 					await msg.channel.send(embed=self.embed("no such module: `" + cmd.module + "`", 0xBB0000))
+					return
+				cmd_func = mod.lookup_command(cmd.command)
+				if not cmd_func:
+					if self.logging: self.log("no such command: " + cmd.command + " in module " + cmd.module, "ERROR", "lookup_command")
+					await msg.channel.send(embed=self.embed("no such command `" + cmd.command + "` in module `" + cmd.module + "`", 0xBB0000))
+					return
+				try:
+					if len(getfullargspec(cmd_func)[0]) < 3:
+						await cmd_func(self, msg)
+					else:
+						await cmd_func(self, msg, *cmd.args)
+				except Exception as err:
+					if self.logging: self.log("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), "ERROR")
+					await msg.channel.send(embed=self.embed("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), 0xBB0000))
+				if self.logging: self.log("completed " + cmd.module + "." + cmd.command)
 				await self.handle_command_postrun(cmd)
 
 	def log(self, string, reason="INFO", subprefix=None):
@@ -142,7 +143,7 @@ class MedjedCyborg:
 			for mod2 in self.modules:
 				if name == mod2.name:
 					raise OSError("module is already loaded")
-			if self.logging: self.log("loading module " + name + " (" + os.path.basename(os.path.dirname(filename)) + "/" + os.path.basename(filename) + ")")
+			if self.logging: self.log("loading module " + name + " (" + os.path.basename(os.path.dirname(filename)) + "/" + os.path.basename(filename) + ")", subprefix="load_module")
 			mod = CyborgModule(name, filename)
 		except Exception as err:
 			raise OSError("failed loading module: " + str(err))
@@ -153,10 +154,10 @@ class MedjedCyborg:
 		try:
 			mods = os.listdir(self.mod_dir)
 		except OSError as err:
-			self.log("failed loading modules from " + self.mod_dir + ": " + str(err))
+			self.log("failed loading modules from " + self.mod_dir + ": " + str(err), "ERROR", "load_all_modules")
 			return
 		if not len(mods):
-			if self.logging: self.log("no modules to load")
+			if self.logging: self.log("no modules to load", "WARN", "load_all_modules")
 			return
 		i = 0
 		l = len(mods)
@@ -172,13 +173,13 @@ class MedjedCyborg:
 	def unload_module(self, name):
 		for i in range(len(self.modules)):
 			if self.modules[i].name == name:
-				if self.logging: self.log("unloading module " + name)
+				if self.logging: self.log("unloading module " + name, subprefix="unload_module")
 				del self.modules[i]
 				return
 		raise OSError("module not loaded")
 
 	def unload_all_modules(self):
-		if self.logging: self.log("unloading all modules")
+		if self.logging: self.log("unloading all modules", subprefix="unload_all_modules")
 		self.modules = list()
 
 	def reload_module(self, name):
@@ -197,16 +198,23 @@ class MedjedCyborg:
 		for i in range(len(mods)):
 			filename = self.mod_dir + "/" + mods[i].name + ".py"
 			if not os.path.isfile(filename):
-				if self.logging: self.log("ignoring nonexistent module")
+				if self.logging: self.log("ignoring nonexistent module", "WARN", "reload_all_modules")
 				continue
 			self.load_module(mods[i].name)
 
+	def lookup_module(self, module):
+		if not isinstance(module, str):
+			raise ValueError("module must be str, not " + type(module))
+		for module2 in self.modules:
+			if module2.name == module:
+				return module2
+
 	def embed(self, description, color=0x000000):
 		if not isinstance(description, str):
-			if self.logging: self.log("embed: invalid description")
+			if self.logging: self.log("invalid description", "ERROR", "embed")
 			return None
 		if not isinstance(color, int):
-			if self.logging: self.log("embed: invalid color")
+			if self.logging: self.log("invalid color", "ERROR", "embed")
 		embed = discord.Embed()
 		embed.description = description
 		embed.type = "rich"
