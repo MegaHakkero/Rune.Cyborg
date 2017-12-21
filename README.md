@@ -10,7 +10,7 @@ uid (int): Your user ID - used to make sure no-one else can run commands
 cmd_prefix (string): The prefix that should be attached to each command you want to run in Discord
 logging (bool): Whether to do logging or not (NOTE: not to a file, but the terminal)
 log_prefix (string): The prefix that should be attached to each line of Medjed.Cyborg's log output
-mod_dir (string): A folder for all module-related functions
+mod_dir (string): A folder that contains all the modules
 ```
 Following are all of the client's functions that you can use in modules to implement functionality:
 ```py
