@@ -23,7 +23,7 @@ MedjedCyborg.unload_all_modules() # Unloads all modules
 MedjedCyborg.reload_module(name <string>) # Attempts to reload the given module from mod_dir
 MedjedCyborg.reload_all_modules() # Attempts to reload all modules from mod_dir
 MedjedCyborg.lookup_module(name <string>) # Searches for a module called <name>, and returns it if found; otherwise returns None
-MedjedCyborg.embed(description <string>, color <int>) # A convenient function for creating text-only embeds
+MedjedCyborg.embed_factory(description <string>, color <int>) # A convenient function for creating text-only embeds
 ```
 I've also included in some hooks for certain events like the client connecting. They're all coroutines (`async def`) that you can override with a class that extends `MedjedCyborg`. The `CyborgCommand` type I've used in some of them is an object that automatically parses commands when initialized.
 ```py
