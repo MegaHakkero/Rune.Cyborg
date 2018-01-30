@@ -52,9 +52,7 @@ class CyborgModule:
 	def lookup_command(self, cmd):
 		if not isinstance(cmd, str):
 			raise ValueError("cmd must be str, not " + type(cmd))
-		for cmd2 in self.commands:
-			if cmd2 == cmd:
-				return self.commands[cmd]
+		return self.commands.get(cmd, None)
 
 class MedjedCyborg:
 	def __init__(self, token, uid, cmd_prefix="//", logging=False, log_prefix="Medjed.Cyborg", mod_dir="./modules"):
@@ -140,9 +138,8 @@ class MedjedCyborg:
 		mod = None
 		try:
 			filename = self.mod_dir + "/" + name + ".py"
-			for mod2 in self.modules:
-				if name == mod2.name:
-					raise OSError("module is already loaded")
+			if self.lookup_module(name):
+				raise OSError("module is already loaded")
 			if self.logging: self.log("loading module " + name + " (" + os.path.basename(os.path.dirname(filename)) + "/" + os.path.basename(filename) + ")", subprefix="load_module")
 			mod = CyborgModule(name, filename)
 		except Exception as err:
@@ -171,12 +168,12 @@ class MedjedCyborg:
 			self.load_module(fl[:-3])
 	
 	def unload_module(self, name):
-		for i in range(len(self.modules)):
-			if self.modules[i].name == name:
-				if self.logging: self.log("unloading module " + name, subprefix="unload_module")
-				del self.modules[i]
-				return
-		raise OSError("module not loaded")
+		mod = self.lookup_module(name)
+		if not mod:
+			raise OSError("module not loaded")
+		mod_index = self.modules.index(mod)
+		if self.logging: self.log("unloading module " + name, subprefix="unload_module")
+		del self.modules[mod_index]
 
 	def unload_all_modules(self):
 		if self.logging: self.log("unloading all modules", subprefix="unload_all_modules")
@@ -209,7 +206,7 @@ class MedjedCyborg:
 			if module2.name == module:
 				return module2
 
-	def embed(self, description, color=0x000000):
+	def embed_factory(self, description, color=0x000000):
 		if not isinstance(description, str):
 			if self.logging: self.log("invalid description", "ERROR", "embed")
 			return None
@@ -230,4 +227,3 @@ class MedjedCyborg:
 
 	async def handle_command_postrun(self, cmd):
 		self.log("DUMMY handle_command_postrun called")
-
