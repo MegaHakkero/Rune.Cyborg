@@ -94,18 +94,18 @@ class MedjedCyborg:
 					cmd = CyborgCommand(msg.content[len(self.cmd_prefix):])
 				except Exception as err:
 					self.log("invalid command: " + str(err), "ERROR")
-					await msg.channel.send(embed=self.embed("invalid command (" + str(err) + ")", 0xBB0000))
+					await msg.channel.send(embed=self.embed_factory("invalid command (" + str(err) + ")", 0xBB0000))
 					return
 				await self.handle_command_prerun(cmd)
 				mod = self.lookup_module(cmd.module)
 				if not mod:
 					if self.logging: self.log("no such module: " + cmd.module, "ERROR", "lookup_module")
-					await msg.channel.send(embed=self.embed("no such module: `" + cmd.module + "`", 0xBB0000))
+					await msg.channel.send(embed=self.embed_factory("no such module: `" + cmd.module + "`", 0xBB0000))
 					return
 				cmd_func = mod.lookup_command(cmd.command)
 				if not cmd_func:
 					if self.logging: self.log("no such command: " + cmd.command + " in module " + cmd.module, "ERROR", "lookup_command")
-					await msg.channel.send(embed=self.embed("no such command `" + cmd.command + "` in module `" + cmd.module + "`", 0xBB0000))
+					await msg.channel.send(embed=self.embed_factory("no such command `" + cmd.command + "` in module `" + cmd.module + "`", 0xBB0000))
 					return
 				try:
 					if len(getfullargspec(cmd_func)[0]) < 3:
@@ -114,7 +114,7 @@ class MedjedCyborg:
 						await cmd_func(self, msg, *cmd.args)
 				except Exception as err:
 					if self.logging: self.log("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), "ERROR")
-					await msg.channel.send(embed=self.embed("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), 0xBB0000))
+					await msg.channel.send(embed=self.embed_factory("failed to run " + cmd.module + "." + cmd.command + ": " + str(err), 0xBB0000))
 				if self.logging: self.log("completed " + cmd.module + "." + cmd.command)
 				await self.handle_command_postrun(cmd)
 
